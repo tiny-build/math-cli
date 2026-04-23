@@ -29,14 +29,6 @@ export function Scene3Doubt() {
 
 	return (
 		<Box flexDirection="column" gap={1} paddingX={2}>
-			<Box justifyContent="center">
-				<Text
-					color={flickerPhase === "steady" ? theme.mauve : theme.overlay}
-					dimColor={flickerPhase !== "steady"}
-				>
-					{"~ shadows and whispers ~"}
-				</Text>
-			</Box>
 			<Box
 				flexDirection="column"
 				borderStyle="round"
@@ -50,13 +42,6 @@ export function Scene3Doubt() {
 					</Text>
 				))}
 			</Box>
-			{flickerPhase === "steady" && (
-				<Box justifyContent="center">
-					<Text color={theme.subtext} dimColor>
-						{"but the light stays on…"}
-					</Text>
-				</Box>
-			)}
 		</Box>
 	);
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { Box, render, Text, useApp, useInput } from "ink";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "./components/Header.js";
+import { IntroLoader } from "./components/IntroLoader.js";
 import { Path } from "./components/Path.js";
-import { pickLoader } from "./loaders.js";
 import {
 	Scene1Opening,
 	Scene2Mathbook,
@@ -28,18 +28,15 @@ const SCENES = [
 ] as const;
 
 const TOTAL = SCENES.length;
-const WALK_DURATION = 900;
 const MIN_COLS = 60;
 
 function App() {
 	const { exit } = useApp();
+	const [phase, setPhase] = useState<"intro" | "show">("intro");
 	const [sceneIndex, setSceneIndex] = useState(0);
-	const [phase, setPhase] = useState<"walking" | "onStage">("onStage");
-	const [loaderMessage, setLoaderMessage] = useState("");
 	const [replayKey, setReplayKey] = useState(0);
 	const [goodbye, setGoodbye] = useState(false);
 	const [cols, setCols] = useState(process.stdout.columns ?? 80);
-	const walkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	useEffect(() => {
 		const onResize = () => setCols(process.stdout.columns ?? 80);
@@ -48,23 +45,6 @@ function App() {
 			process.stdout.off("resize", onResize);
 		};
 	}, []);
-
-	useEffect(() => {
-		return () => {
-			if (walkTimerRef.current) clearTimeout(walkTimerRef.current);
-		};
-	}, []);
-
-	const walkTo = (direction: 1 | -1) => {
-		if (walkTimerRef.current) clearTimeout(walkTimerRef.current);
-		setLoaderMessage(pickLoader());
-		setPhase("walking");
-		walkTimerRef.current = setTimeout(() => {
-			setSceneIndex((i) => i + direction);
-			setPhase("onStage");
-			setReplayKey((k) => k + 1);
-		}, WALK_DURATION);
-	};
 
 	useInput((input, key) => {
 		if (goodbye) return;
@@ -75,15 +55,17 @@ function App() {
 			return;
 		}
 
-		if (phase !== "onStage") return;
+		if (phase !== "show") return;
 
 		if ((key.rightArrow || input === " ") && sceneIndex < TOTAL - 1) {
-			walkTo(1);
+			setSceneIndex((i) => i + 1);
+			setReplayKey((k) => k + 1);
 			return;
 		}
 
 		if (key.leftArrow && sceneIndex > 0) {
-			walkTo(-1);
+			setSceneIndex((i) => i - 1);
+			setReplayKey((k) => k + 1);
 			return;
 		}
 
@@ -115,6 +97,20 @@ function App() {
 		);
 	}
 
+	if (phase === "intro") {
+		return (
+			<Box
+				flexDirection="column"
+				borderStyle="round"
+				borderColor={theme.mauve}
+				paddingX={2}
+				paddingY={1}
+			>
+				<IntroLoader onDone={() => setPhase("show")} />
+			</Box>
+		);
+	}
+
 	const CurrentScene = SCENES[sceneIndex]!;
 
 	return (
@@ -136,18 +132,12 @@ function App() {
 				paddingY={1}
 				minHeight={12}
 			>
-				{phase === "walking" ? (
-					<Box flexDirection="column" alignItems="center" justifyContent="center" paddingY={2}>
-						<Text color={theme.mauve}>{loaderMessage}</Text>
-					</Box>
-				) : (
-					<Box flexDirection="column" key={replayKey}>
-						<CurrentScene />
-					</Box>
-				)}
+				<Box flexDirection="column" key={replayKey}>
+					<CurrentScene />
+				</Box>
 			</Box>
 
-			<Path walking={phase === "walking"} sceneIndex={sceneIndex} totalScenes={TOTAL} />
+			<Path sceneIndex={sceneIndex} totalScenes={TOTAL} />
 
 			<Box justifyContent="center">
 				<Text color={theme.overlay} dimColor>

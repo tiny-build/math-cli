@@ -47,11 +47,6 @@ export function Scene1Opening() {
 					</Text>
 				))}
 			</Box>
-			<Box justifyContent="center">
-				<Text color={theme.overlay} dimColor>
-					{"· · · press → to continue · · ·"}
-				</Text>
-			</Box>
 		</Box>
 	);
 }

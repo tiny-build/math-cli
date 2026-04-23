@@ -1,14 +1,7 @@
-const messages = [
+export const introLoaders = [
 	"wait da — buffering for your tiny yet crazy brain…",
-	"thinking of how to annoy you…",
-	"recompiling feelings…",
-	"fetching sparkles from the void…",
-	"asking the stars nicely…",
-	"loading stanza.exe with love…",
-	"polishing the next scene…",
-	"tying ribbons on the pixels…",
+	"analysing how to annoy you…",
+	"finding your sense of humour…",
+	"optimising for maximum cringe…",
+	"checking if you’re still there…",
 ];
-
-export function pickLoader(): string {
-	return messages[Math.floor(Math.random() * messages.length)]!;
-}

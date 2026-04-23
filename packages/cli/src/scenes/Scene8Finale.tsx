@@ -71,12 +71,9 @@ export function Scene8Finale() {
 			</Box>
 
 			{showSignature && (
-				<Box flexDirection="column" alignItems="center" gap={0} marginTop={1}>
+				<Box marginTop={1}>
 					<Text color={gradientColor(sigColorIdx)} bold>
 						{"made with 🌸 by Terminal Dude"}
-					</Text>
-					<Text color={theme.overlay} dimColor>
-						{"← go back  ·  r replay  ·  q quit"}
 					</Text>
 				</Box>
 			)}

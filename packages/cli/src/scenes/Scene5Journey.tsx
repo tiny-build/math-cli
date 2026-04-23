@@ -26,11 +26,6 @@ export function Scene5Journey() {
 
 	return (
 		<Box flexDirection="column" gap={1} paddingX={2}>
-			<Box justifyContent="center">
-				<Text color={theme.green} bold>
-					{"~ since January's dawn ~"}
-				</Text>
-			</Box>
 			<Box flexDirection="column" gap={0}>
 				{lines.map((line, i) => (
 					<Text key={i} color={i === 3 ? theme.green : theme.text}>
@@ -40,13 +35,6 @@ export function Scene5Journey() {
 			</Box>
 			<Box flexDirection="column" gap={0} paddingX={1}>
 				<ProgressBar value={progress} width={24} label={labelText} />
-				{progress === 1 && (
-					<Box marginTop={1}>
-						<Text color={theme.yellow} bold>
-							{"✦ look how far you've come ✦"}
-						</Text>
-					</Box>
-				)}
 			</Box>
 		</Box>
 	);

@@ -8,11 +8,6 @@ export function Scene6Constellations() {
 
 	return (
 		<Box flexDirection="column" gap={1} paddingX={2}>
-			<Box justifyContent="center">
-				<Text color={theme.yellow} bold>
-					{"~ a year and a half of stars ~"}
-				</Text>
-			</Box>
 			<Constellation />
 			<Box flexDirection="column" gap={0}>
 				{lines.map((line, i) => (

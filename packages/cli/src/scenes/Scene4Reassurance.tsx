@@ -33,11 +33,6 @@ export function Scene4Reassurance() {
 					</Text>
 				))}
 			</Box>
-			<Box justifyContent="center">
-				<Text color={glow} bold>
-					{"✦ the spark is still here ✦"}
-				</Text>
-			</Box>
 		</Box>
 	);
 }

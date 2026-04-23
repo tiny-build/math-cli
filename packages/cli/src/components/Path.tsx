@@ -3,40 +3,45 @@ import { useEffect, useState } from "react";
 import { theme } from "../theme.js";
 
 interface Props {
-	walking: boolean;
 	sceneIndex: number;
 	totalScenes: number;
 }
 
 const PATH_WIDTH = 44;
-const SPRITE_WIDTH = 3;
+const SPRITE_WIDTH = 5;
 
-const FRAME_A = [" o ", "/|\\", "/ \\"];
-const FRAME_B = [" o ", "/|\\", " \\\\"];
+type Frame = readonly [string, string, string, string, string];
 
-export function Path({ walking, sceneIndex, totalScenes }: Props) {
-	const [frame, setFrame] = useState<"A" | "B">("A");
-	const [spritePos, setSpritePos] = useState(() =>
-		Math.floor((sceneIndex / Math.max(totalScenes - 1, 1)) * (PATH_WIDTH - SPRITE_WIDTH)),
-	);
+const STAND: Frame = [" ⋆   ", " ◝ω◜ ", "/|♡|\\", " | | ", " d b "] as const;
 
+const WALK_A: Frame = ["  ⋆  ", " ◝ω◜ ", " |♡|>", "<| |>", " d b "] as const;
+
+const WALK_B: Frame = ["⋆    ", " ◝ω◜ ", "<|♡| ", "<| |>", " b d "] as const;
+
+const ROW_COLORS: string[] = [theme.yellow, theme.peach, theme.pink, theme.mauve, theme.lavender];
+
+function rowColor(i: number): string {
+	return ROW_COLORS[i] ?? theme.pink;
+}
+
+export function Path({ sceneIndex, totalScenes }: Props) {
 	const targetPos = Math.floor(
 		(sceneIndex / Math.max(totalScenes - 1, 1)) * (PATH_WIDTH - SPRITE_WIDTH),
 	);
 
+	const [frameIdx, setFrameIdx] = useState(0);
+	const [spritePos, setSpritePos] = useState(targetPos);
+
 	useEffect(() => {
-		if (!walking) {
-			setSpritePos(targetPos);
-			setFrame("A");
-			return;
-		}
+		if (spritePos === targetPos) return;
 		const frameTimer = setInterval(() => {
-			setFrame((f) => (f === "A" ? "B" : "A"));
-		}, 150);
+			setFrameIdx((f) => (f + 1) % 2);
+		}, 140);
 		const moveTimer = setInterval(() => {
 			setSpritePos((p) => {
 				if (p < targetPos) return p + 1;
 				if (p > targetPos) return p - 1;
+				clearInterval(moveTimer);
 				return p;
 			});
 		}, 35);
@@ -44,9 +49,13 @@ export function Path({ walking, sceneIndex, totalScenes }: Props) {
 			clearInterval(frameTimer);
 			clearInterval(moveTimer);
 		};
-	}, [walking, targetPos]);
+	}, [targetPos, spritePos]);
 
-	const spriteLines = frame === "A" ? FRAME_A : FRAME_B;
+	useEffect(() => {
+		if (spritePos === targetPos) setFrameIdx(0);
+	}, [spritePos, targetPos]);
+
+	const frame: Frame = spritePos === targetPos ? STAND : frameIdx === 0 ? WALK_A : WALK_B;
 
 	const buildDotRow = () => {
 		let row = "";
@@ -62,20 +71,15 @@ export function Path({ walking, sceneIndex, totalScenes }: Props) {
 
 	return (
 		<Box flexDirection="column">
-			<Box>
-				<Text color={theme.pink}>
-					{leftPad}
-					{spriteLines[0]}
-					{rightPad}
-				</Text>
-			</Box>
-			<Box>
-				<Text color={theme.pink}>
-					{leftPad}
-					{spriteLines[1]}
-					{rightPad}
-				</Text>
-			</Box>
+			{frame.map((line, i) => (
+				<Box key={i}>
+					<Text color={rowColor(i)}>
+						{leftPad}
+						{line}
+						{rightPad}
+					</Text>
+				</Box>
+			))}
 			<Box>
 				<Text color={theme.overlay}>{buildDotRow()}</Text>
 			</Box>
