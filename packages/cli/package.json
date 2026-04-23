@@ -1,6 +1,6 @@
 {
 	"name": "@tiny-build/math-cli",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "A beautiful animated CLI — by tiny-build",
 	"license": "MIT",
 	"type": "module",
