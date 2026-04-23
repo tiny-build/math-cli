@@ -55,8 +55,3 @@ jobs:
           # the GitHub OIDC token for a short-lived npm publish token.
           NPM_CONFIG_PROVENANCE: true
           NPM_CONFIG_ACCESS: public
-
-      - name: Publish to jsr
-        if: steps.changesets.outputs.published == 'true'
-        run: pnpx jsr publish --allow-dirty
-        working-directory: packages/cli

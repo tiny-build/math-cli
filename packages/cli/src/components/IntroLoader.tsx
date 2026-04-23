@@ -4,7 +4,7 @@ import { introLoaders } from "../loaders.js";
 import { gradientColor, theme } from "../theme.js";
 
 const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-const MESSAGE_DURATION = 1200;
+const MESSAGE_DURATION = 4200;
 
 interface Props {
 	onDone: () => void;
