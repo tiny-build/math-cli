@@ -1,33 +1,33 @@
 {
-  "name": "@tiny-build/math-cli",
-  "version": "0.0.0",
-  "description": "A beautiful animated CLI — by tiny-build",
-  "license": "MIT",
-  "type": "module",
-  "bin": {
-    "math-cli": "./dist/src/index.js"
-  },
-  "exports": {
-    ".": "./dist/src/index.js"
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "engines": {
-    "node": ">=22"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "dependencies": {
-    "@inkjs/ui": "2.0.0",
-    "ink": "7.0.1",
-    "react": "19.2.5"
-  },
-  "devDependencies": {
-    "@types/node": "25.6.0",
-    "@types/react": "19.2.14"
-  }
+	"name": "@tiny-build/math-cli",
+	"version": "0.0.0",
+	"description": "A beautiful animated CLI — by tiny-build",
+	"license": "MIT",
+	"type": "module",
+	"bin": {
+		"math-cli": "./dist/src/index.js"
+	},
+	"exports": {
+		".": "./dist/src/index.js"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"engines": {
+		"node": ">=22"
+	},
+	"publishConfig": {
+		"access": "public",
+		"registry": "https://registry.npmjs.org/"
+	},
+	"dependencies": {
+		"@inkjs/ui": "2.0.0",
+		"ink": "7.0.1",
+		"react": "19.2.5"
+	},
+	"devDependencies": {
+		"@types/node": "25.6.0",
+		"@types/react": "19.2.14"
+	}
 }
