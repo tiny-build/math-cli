@@ -1,137 +1,151 @@
 #!/usr/bin/env node
-import { createRequire } from "node:module";
-import { Box, render, Text, useApp } from "ink";
+import { Box, render, Text, useApp, useInput } from "ink";
 import { useEffect, useState } from "react";
+import { Header } from "./components/Header.js";
+import { IntroLoader } from "./components/IntroLoader.js";
+import { Path } from "./components/Path.js";
+import {
+	Scene1Opening,
+	Scene2Mathbook,
+	Scene3Doubt,
+	Scene4Reassurance,
+	Scene5Journey,
+	Scene6Constellations,
+	Scene7Motivation,
+	Scene8Finale,
+} from "./scenes/index.js";
+import { theme } from "./theme.js";
 
-const { version } = createRequire(import.meta.url)("../../package.json") as {
-	version: string;
-};
+const SCENES = [
+	Scene1Opening,
+	Scene2Mathbook,
+	Scene3Doubt,
+	Scene4Reassurance,
+	Scene5Journey,
+	Scene6Constellations,
+	Scene7Motivation,
+	Scene8Finale,
+] as const;
 
-const FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-
-const GRADIENT = [
-	"#FF6B6B",
-	"#FF8E53",
-	"#FFC300",
-	"#2ECC71",
-	"#1ABC9C",
-	"#3498DB",
-	"#9B59B6",
-	"#FF6B6B",
-];
-
-function Spinner() {
-	const [frame, setFrame] = useState(0);
-
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setFrame((f) => (f + 1) % FRAMES.length);
-		}, 80);
-		return () => clearInterval(timer);
-	}, []);
-
-	return <Text color="cyan">{FRAMES[frame]!}</Text>;
-}
-
-function AnimatedTitle() {
-	const [colorIndex, setColorIndex] = useState(0);
-
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setColorIndex((i) => (i + 1) % GRADIENT.length);
-		}, 200);
-		return () => clearInterval(timer);
-	}, []);
-
-	return (
-		<Text bold color={GRADIENT[colorIndex]!}>
-			{"✦  math-cli  ✦"}
-		</Text>
-	);
-}
-
-function Counter() {
-	const [count, setCount] = useState(0);
-
-	useEffect(() => {
-		const timer = setInterval(() => {
-			setCount((c) => c + 1);
-		}, 1000);
-		return () => clearInterval(timer);
-	}, []);
-
-	return (
-		<Text>
-			<Text color="gray">{"uptime: "}</Text>
-			<Text color="yellow" bold>
-				{`${count}s`}
-			</Text>
-		</Text>
-	);
-}
+const TOTAL = SCENES.length;
+const MIN_COLS = 60;
 
 function App() {
 	const { exit } = useApp();
+	const [phase, setPhase] = useState<"intro" | "show">("intro");
+	const [sceneIndex, setSceneIndex] = useState(0);
+	const [replayKey, setReplayKey] = useState(0);
+	const [goodbye, setGoodbye] = useState(false);
+	const [cols, setCols] = useState(process.stdout.columns ?? 80);
 
 	useEffect(() => {
-		const onKey = (data: Buffer) => {
-			const key = data.toString();
-			if (key === "q" || key === "\x03") {
-				exit();
-			}
-		};
-		process.stdin.on("data", onKey);
+		const onResize = () => setCols(process.stdout.columns ?? 80);
+		process.stdout.on("resize", onResize);
 		return () => {
-			process.stdin.off("data", onKey);
+			process.stdout.off("resize", onResize);
 		};
-	}, [exit]);
+	}, []);
+
+	useInput((input, key) => {
+		if (goodbye) return;
+
+		if (input === "q" || key.escape) {
+			setGoodbye(true);
+			setTimeout(() => exit(), 1200);
+			return;
+		}
+
+		if (phase !== "show") return;
+
+		if ((key.rightArrow || input === " ") && sceneIndex < TOTAL - 1) {
+			setSceneIndex((i) => i + 1);
+			setReplayKey((k) => k + 1);
+			return;
+		}
+
+		if (key.leftArrow && sceneIndex > 0) {
+			setSceneIndex((i) => i - 1);
+			setReplayKey((k) => k + 1);
+			return;
+		}
+
+		if (input === "r") {
+			setReplayKey((k) => k + 1);
+		}
+	});
+
+	if (goodbye) {
+		return (
+			<Box flexDirection="column" alignItems="center" gap={1} paddingY={1}>
+				<Text bold color={theme.pink}>
+					{"✦ goodbye, Math ✦"}
+				</Text>
+				<Text color={theme.peach}>{"go build something beautiful today 💕"}</Text>
+				<Text color={theme.overlay} dimColor>
+					{"made with 🌸 by Terminal Dude"}
+				</Text>
+			</Box>
+		);
+	}
+
+	if (cols < MIN_COLS) {
+		return (
+			<Box flexDirection="column" paddingX={2} paddingY={1}>
+				<Text color={theme.peach}>{"the stage needs a bit more room —"}</Text>
+				<Text color={theme.subtext}>{" please widen the terminal 💕"}</Text>
+			</Box>
+		);
+	}
+
+	if (phase === "intro") {
+		return (
+			<Box
+				flexDirection="column"
+				borderStyle="round"
+				borderColor={theme.mauve}
+				paddingX={2}
+				paddingY={1}
+			>
+				<IntroLoader onDone={() => setPhase("show")} />
+			</Box>
+		);
+	}
+
+	const CurrentScene = SCENES[sceneIndex]!;
 
 	return (
 		<Box
 			flexDirection="column"
 			borderStyle="round"
-			borderColor="cyan"
-			paddingX={3}
+			borderColor={theme.mauve}
+			paddingX={2}
 			paddingY={1}
 			gap={1}
 		>
+			<Header sceneIndex={sceneIndex} totalScenes={TOTAL} />
+
+			<Box
+				flexDirection="column"
+				borderStyle="single"
+				borderColor={theme.overlay}
+				paddingX={1}
+				paddingY={1}
+				minHeight={12}
+			>
+				<Box flexDirection="column" key={replayKey}>
+					<CurrentScene />
+				</Box>
+			</Box>
+
+			<Path sceneIndex={sceneIndex} totalScenes={TOTAL} />
+
 			<Box justifyContent="center">
-				<AnimatedTitle />
-			</Box>
-
-			<Box gap={2} justifyContent="center">
-				<Spinner />
-				<Text color="gray">{"@tiny-build/math-cli"}</Text>
-				<Spinner />
-			</Box>
-
-			<Box flexDirection="column" gap={0}>
-				<Text>
-					<Text color="green">{"✓ "}</Text>
-					<Text color="white">{"Ready and running"}</Text>
-				</Text>
-				<Text>
-					<Text color="blue">{"ℹ "}</Text>
-					<Text color="white">{"Version "}</Text>
-					<Text color="cyan">{version}</Text>
+				<Text color={theme.overlay} dimColor>
+					{"← → or space navigate  ·  r replay  ·  q quit"}
 				</Text>
 			</Box>
-
-			<Box borderStyle="single" borderColor="gray" paddingX={2}>
-				<Counter />
-			</Box>
-
-			<Text color="gray" dimColor>
-				{"Press "}
-				<Text color="white">{"q"}</Text>
-				{" to exit"}
-			</Text>
 		</Box>
 	);
-}
-
-if (process.stdin.isTTY) {
-	process.stdin.setRawMode(true);
 }
 
 render(<App />);
