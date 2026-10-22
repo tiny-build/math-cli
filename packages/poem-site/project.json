@@ -1,0 +1,56 @@
+{
+	"name": "@tiny-build/poem-site",
+	"$schema": "../../node_modules/nx/schemas/project-schema.json",
+	"sourceRoot": "packages/poem-site/src",
+	"projectType": "application",
+	"targets": {
+		"dev": {
+			"executor": "nx:run-commands",
+			"continuous": true,
+			"options": {
+				"command": "pnpm exec vite --host",
+				"cwd": "packages/poem-site"
+			}
+		},
+		"build": {
+			"executor": "nx:run-commands",
+			"outputs": ["{projectRoot}/dist"],
+			"inputs": ["production", { "env": "SITE_URL" }, { "env": "BASE_PATH" }],
+			"options": {
+				"command": "pnpm exec vite build",
+				"cwd": "packages/poem-site"
+			}
+		},
+		"preview": {
+			"executor": "nx:run-commands",
+			"continuous": true,
+			"options": {
+				"command": "pnpm exec vite preview --host",
+				"cwd": "packages/poem-site"
+			},
+			"dependsOn": ["build"]
+		},
+		"lint": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "pnpm exec biome check src/ scripts/ vite.config.js index.html",
+				"cwd": "packages/poem-site"
+			}
+		},
+		"og": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "node scripts/build-og.mjs",
+				"cwd": "packages/poem-site"
+			}
+		},
+		"deploy": {
+			"executor": "nx:run-commands",
+			"options": {
+				"command": "pnpm exec gh-pages -d dist --dotfiles --nojekyll -m \"chore(poem-site): deploy\"",
+				"cwd": "packages/poem-site"
+			},
+			"dependsOn": ["build"]
+		}
+	}
+}

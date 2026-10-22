@@ -1,0 +1,22 @@
+{
+	"name": "@tiny-build/poem-site",
+	"version": "0.0.0",
+	"private": true,
+	"description": "A scroll-driven 3D poem for Math — hosted on GitHub Pages",
+	"license": "MIT",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview",
+		"og": "node scripts/build-og.mjs",
+		"deploy": "vite build && gh-pages -d dist --dotfiles --nojekyll -m \"chore(poem-site): deploy\""
+	},
+	"dependencies": {
+		"three": "0.186.1"
+	},
+	"devDependencies": {
+		"gh-pages": "6.3.0",
+		"vite": "8.3.5"
+	}
+}
